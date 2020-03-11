@@ -1,0 +1,26 @@
+[Unit]
+Description=MetricServer Service
+After=network.target fluentd.service, scapl-cnt-metric.service
+
+[Service]
+User=devuser
+Group=devuser
+Type=simple
+Restart=always
+RestartSec=60s
+StartLimitInterval=330
+StartLimitBurst=5
+StartLimitAction=reboot
+Environment=VIRTUAL_ENV=/usr/local/apl
+Environment=PATH=$VIRTUAL_ENV/bin:$PATH
+Environment=PYTHONPATH=/usr/local/apl
+WorkingDirectory=/usr/local/apl
+ExecStart=/usr/local/apl/bin/gunicorn wsgi --bind=0.0.0.0:59091 --reload
+PIDFile=/usr/local/apl/metricsrv.pid
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=65536
+
+[Install]
+WantedBy=multi-user.target

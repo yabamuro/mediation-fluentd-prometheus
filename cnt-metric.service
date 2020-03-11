@@ -1,0 +1,25 @@
+[Unit]
+Description=Metric Count Service
+After=network.target fluentd.service
+
+[Service]
+User=devuser
+Group=devuser
+Type=simple
+Restart=always
+RestartSec=60s
+StartLimitInterval=330
+StartLimitBurst=5
+StartLimitAction=reboot
+Environment=VIRTUAL_ENV=/usr/local/apl
+Environment=PATH=$VIRTUAL_ENV/bin:$PATH
+Environment=PYTHONPATH=/usr/local/apl
+ExecStart=/usr/local/apl/bin/python ${VIRTUAL_ENV}/MetricCount.py
+PIDFile=/usr/local/apl/metric.pid
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=65536
+
+[Install]
+WantedBy=multi-user.target
